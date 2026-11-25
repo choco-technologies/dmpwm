@@ -1,0 +1,7 @@
+# DMOD_TOOLS_NAME must match a directory under dmod/configs/arch/...
+# Known mappings used elsewhere in the ecosystem:
+#   stm32f7  -> arch/armv7/cortex-m7
+#   stm32f4  -> arch/armv7/cortex-m4
+#   esp32s3  -> arch/xtensa/esp32s3
+#   x86_64   -> arch/x86_64
+set(DMOD_TOOLS_NAME "arch/xtensa/esp32s3" CACHE STRING "Name of the tools configuration")
