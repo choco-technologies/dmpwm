@@ -6,6 +6,8 @@ The module is split into the core (`dmpwm`: configuration, the device, the ioctl
 | Port | Peripheral |
 |------|------------|
 | `esp32s3` | LEDC (low speed group: 4 timers, 8 channels, 80 MHz APB clock; outputs on the pin through the GPIO matrix) |
+| `stm32f4`, `stm32f7` | none yet: every call answers `-ENOTSUP` (the port exists so the headers are published for the families whose display driver uses the ioctl numbering) |
+| `x86_64` | a software stand-in for tests on the host |
 
 ## Configuration
 
