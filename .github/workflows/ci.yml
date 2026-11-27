@@ -30,6 +30,16 @@ jobs:
           cmake .. -DDMOD_MODE=DMOD_MODULE -DDMOD_TOOLS_NAME=arch/x86_64
           cmake --build . --target dmpwm test_dmpwm
 
+      - name: Build x86_64 dmpwm_port stand-in
+        run: |
+          # dmpwm_port has no x86_64 peripheral: src/port/x86_64/port.c is a software stand-in, built so dmod_loader has
+          # something to satisfy dmpwm's runtime dmpwm_port dependency with below.
+          mkdir -p build_dmpwm_port_x86_64
+          cd build_dmpwm_port_x86_64
+          cmake .. -DDMOD_MODE=DMOD_MODULE -DDMOD_TOOLS_NAME=arch/x86_64 -DDMOD_CPU_FAMILY=x86_64
+          cmake --build . --target dmpwm_port
+          cp dmf/dmpwm_port.dmf dmf/dmpwm_port.dmd ../build/dmf/
+
       - name: Verify module files
         run: |
           echo "Checking for module files..."
@@ -42,6 +52,9 @@ jobs:
       - name: Run tests with dmod_loader
         run: |
           export DMOD_DMF_DIR=$(pwd)/build/dmf
+          # dmpwm's runtime dependencies (dmini) are staged into build/dmf first; dmpwm_port (the stand-in above) has no
+          # published x86_64 release, so a failed lookup of it must not stop the run.
+          dmf-get install -d build/dmf/dmpwm.dmd -y || true
           dmod_loader build/dmf/test_dmpwm.dmf
 
   discover-cpu-families:
