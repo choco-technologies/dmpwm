@@ -88,12 +88,18 @@ target_include_directories(${DMOD_MODULE_NAME}_if INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# To depend on another module's headers, use:
-#   dmod_link_modules(${DMOD_MODULE_NAME}
-#       other_module@1.0
-#   )
+# dmdrvi: the driver interface dmpwm implements (src/dmpwm.c), its private ioctl numbering starts at DMDRVI_IOCTL_CUSTOM_BASE.
+# dmini:  .ini config parsing (pin, frequency, resolution, duty).
+dmod_link_modules(${DMOD_MODULE_NAME}
+    dmdrvi@>=2.5
+    dmini
+)
 
 add_subdirectory(src/port)
 target_link_libraries(${DMOD_MODULE_NAME} ${DMOD_MODULE_NAME}_port_if)
 enable_testing()
 add_subdirectory(tests)
+
+if(DMOD_CPU_FAMILY STREQUAL "esp32s3")
+    add_subdirectory(tools/pwmtest)
+endif()
