@@ -27,10 +27,10 @@ dmod_add_library(${DMOD_MODULE_NAME} ${DMOD_MODULE_VERSION}
     ${DMOD_CPU_FAMILY}/port.c
 )
 
-# To depend on another module's headers, use:
-#   dmod_link_modules(${DMOD_MODULE_NAME}
-#       other_module@1.0
-#   )
+# dmdrvi: headers only - dmpwm_types.h numbers the ioctl commands from DMDRVI_IOCTL_CUSTOM_BASE.
+dmod_link_modules(${DMOD_MODULE_NAME}
+    dmdrvi@>=2.2
+)
 
 target_include_directories(${DMOD_MODULE_NAME} BEFORE PRIVATE
     ${CMAKE_SOURCE_DIR}/include

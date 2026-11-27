@@ -3,31 +3,25 @@
 
 #include "dmod_types.h"
 #include "dmpwm_port_defs.h"
+#include "dmpwm_types.h"
 
 /*
- * Declare architecture-independent port API functions here, following the
- * dmod_dmpwm_port_api(version, return_type, _suffix, (args)) pattern,
- * e.g.:
- *
- *   dmod_dmpwm_port_api(1.0, int, _configure, ( int some_arg ) );
- *
- * Each declaration here must have a matching *definition* in
- * src/port/<arch>/port.c (or a shared src/port/<arch>_common/ file), written
- * with the dmod_dmpwm_port_api_declaration(...) macro instead:
- *
- *   dmod_dmpwm_port_api_declaration(1.0, int, _configure, ( int some_arg ) )
- *   {
- *       ...
- *   }
- *
- * Note this is a *different* mechanism from the dmod_init()/dmod_deinit()
- * module lifecycle hooks already defined in port.c - don't declare `_init`/
- * `_deinit` here too, that name collides with the lifecycle hooks and (unlike
- * them) requires an explicit dmod_dmpwm_port_api_declaration(...)
- * definition to avoid an undefined-reference link error.
- *
- * See dmfmc/include/dmfmc_port.h and dmfmc/src/port/stm32_common/stm32_common.c
- * for a fully worked example.
+ * The port only drives the peripheral (ESP32-S3: LEDC). The configuration, the ini, the dmdrvi device and the
+ * ioctl live in the core module (src/dmpwm.c). A channel is what _start() returns: a number >= 0.
  */
+
+/** Starts an output, returns its channel or -errno (-ENOMEM: no free channel or timer, -EINVAL: no such pin or frequency) */
+dmod_dmpwm_port_api(1.0, int, _start, ( const dmpwm_config_t *config ) );
+
+/** Stops the output and releases the channel (the pin is left low) */
+dmod_dmpwm_port_api(1.0, void, _stop, ( int channel ) );
+
+dmod_dmpwm_port_api(1.0, int, _set_duty, ( int channel, uint16_t duty ) );
+
+/** Changes the frequency; the duty stays the same fraction of the period */
+dmod_dmpwm_port_api(1.0, int, _set_frequency, ( int channel, uint32_t frequency_hz ) );
+
+/** Disabled: the pin stays at the idle level (low, high when inverted) */
+dmod_dmpwm_port_api(1.0, int, _set_enabled, ( int channel, bool enabled ) );
 
 #endif // DMPWM_PORT_H

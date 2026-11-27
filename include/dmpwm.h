@@ -6,46 +6,30 @@
 #include <stddef.h>
 #include "dmod_types.h"
 #include "dmpwm_defs.h"
+#include "dmpwm_types.h"
 
 /**
- * Public API for the dmpwm module.
+ * dmpwm: a PWM output as a dmdrvi device (/dev/dmpwm<N>), one per section of the ini:
  *
- * Functions are declared with the dmod_dmpwm_api(...) macro - dmod's
- * standard pattern for functions callable from other modules (or from this
- * module's own tests/), resolved dynamically by the loader rather than
- * through normal static linkage. See dm_sw_ring/include/dm_sw_ring.h for a
- * fully worked real-world example of the same shape.
+ *   [backlight_pwm]
+ *   driver_name=dmpwm
+ *   pin=2
+ *   frequency=5000
+ *   resolution=10
+ *   duty=100         ; percent after the start
+ *   inverted=off
+ *   enabled=on
  *
- * Definitions in src/dmpwm.c use the matching
- * dmod_dmpwm_api_declaration(...) macro - a plain C function
- * definition here will NOT satisfy these declarations at link time.
- *
- * This is an example interface using the usual "opaque handle" pattern -
- * replace the handle, functions, and struct definition in
- * src/dmpwm.c with your module's real API.
+ * The device is driven with Dmod_Ioctl(): dmpwm_ioctl_cmd_set_duty and the other commands of dmpwm_types.h.
  */
 
-/* Opaque handle - the real struct is defined in src/dmpwm.c */
-typedef struct dmpwm* dmpwm_t;
+/** Converts percent (0 .. 100, more is 100) into the duty of the ioctl */
+dmod_dmpwm_api(1.0, uint16_t, _percent_to_duty, ( uint8_t percent ));
 
-/**
- * Create a new dmpwm instance.
- *
- * @return A valid handle on success, or NULL on allocation failure.
- */
-dmod_dmpwm_api(1.0, dmpwm_t, _create, ( void ));
+/** Converts the duty of the ioctl into percent (rounded) */
+dmod_dmpwm_api(1.0, uint8_t, _duty_to_percent, ( uint16_t duty ));
 
-/**
- * Destroy an instance created by dmpwm_create(). Safe to call with
- * NULL.
- */
-dmod_dmpwm_api(1.0, void, _destroy, ( dmpwm_t handle ));
-
-/**
- * Example accessor - replace with your module's real API.
- *
- * @return true if handle is a valid, non-NULL instance.
- */
-dmod_dmpwm_api(1.0, bool, _is_valid, ( dmpwm_t handle ));
+/** True when the configuration can be run by a port */
+dmod_dmpwm_api(1.0, bool, _validate_config, ( const dmpwm_config_t *config ));
 
 #endif // DMPWM_H

@@ -14,6 +14,11 @@ target_include_directories(${DMOD_MODULE_NAME} PRIVATE
 
 target_link_libraries(${DMOD_MODULE_NAME} dmpwm_if)
 
+# dmdrvi: the ioctl numbering of dmpwm_types.h
+dmod_link_modules(${DMOD_MODULE_NAME}
+    dmdrvi@>=2.5
+)
+
 # Register the test module with ctest - this replays the same two steps CI
 # runs (see .github/templates/ci.yml.template): install the test module's
 # dependencies with dmf-get, then execute it through dmod_loader. The test's
